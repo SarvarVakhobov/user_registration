@@ -7,6 +7,15 @@ from rest_framework.views import APIView
 from .serializers import PostSerializer, TagSerializer, BlogSerializer, CategorySerializer, CommentsSerializer
 from main.models import Tag, Post, Category, Blog, Comments
 
+class TagListView(APIView):
+    def get(self, request):
+        try:
+            tags = Tag.objects.all()
+            serializer = Tag(items, many=True)
+        except Exception as e:
+            return Response("There is not any tag or Error")
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 class CreateTagView(generics.CreateAPIView):
     queryset = Tag.objects.all()
     permission_classes = (AllowAny,)
@@ -17,6 +26,23 @@ class CreatePostView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = PostSerializer
 
+class PostView(APIView):
+    def get(self, request, pk):
+        try:
+            post = Post.objects.get(id=pk)
+            serializer = PostSerializer(post)
+        except Exception as e:
+            return Response("There is not any post like this or Error")
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class PostListView(APIView):
+    def get(self, request):
+        try: 
+            posts = Post.objects.all()
+            serializer = PostSerializer(posts, many=True)
+        except Exception as e:
+            return Response("There is not any post or Error")
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class EditPostView(generics.UpdateAPIView):
     queryset = Post.objects.all()
@@ -31,3 +57,4 @@ class EditPostView(generics.UpdateAPIView):
         self.perform_update(serializer)
         return Response(serializer.data)
     
+# class Category
