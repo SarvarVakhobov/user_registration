@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from rest_framework.response import Response
 
 from accounts.api.serializers import UserSerializer
 from main.models import Tag, Comments, Blog, Post, Category
@@ -10,15 +11,16 @@ class TagSerializer(serializers.ModelSerializer):
         required=True,
         validators=[UniqueValidator(queryset=Tag.objects.all())]
     )
+    user = serializers.CharField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Tag
-        fields = ('tag',)
+        fields = ('tag', 'user')
+        
 
     def create(self, validated_data):
-        user = self.context['request'].user
-        print(user)
+
         try:
-            if CustomUser.objects.last().user_group <3:
+            if user.user_group <3:
                 tag = Tag.objects.create(
                     tag=validated_data['tag'],
                 )
@@ -29,11 +31,13 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Post
         fields = '__all__'
 
     def create(self, validated_data):
+        print(validated_data)
         post = Post.objects.create(
             author=validated_data['author'],
             title=validated_data['title'],
@@ -68,6 +72,8 @@ class CategorySerializer(serializers.ModelSerializer):
         return category
 
 class BlogSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Blog
         fields = '__all__'
@@ -93,6 +99,8 @@ class BlogSerializer(serializers.ModelSerializer):
 
 
 class CommentsSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Comments
         fields = '__all__'

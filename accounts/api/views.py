@@ -13,8 +13,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .permissions import OnlyAdmin, AdminAndModirator,AdminModiratorAndEditor
 
-@permission_classes(OnlyAdmin)
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    permission_classes = (OnlyAdmin, IsAuthenticated)
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
@@ -24,22 +24,20 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
-@permission_classes(OnlyAdmin)
 class MyTokenObtainPairView(TokenObtainPairView):
+    permission_classes = (AdminAndModirator, IsAuthenticated)
     serializer_class = MyTokenObtainPairSerializer
 
 
 
-@permission_classes(AdminAndModirator)
-
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (AdminAndModirator, IsAuthenticated)
     serializer_class = RegisterSerializer
 
 
-@permission_classes(AdminModiratorAndEditor)
 class UserDetailView(viewsets.ViewSet):
+    permission_classes = (AdminAndModirator, IsAuthenticated)
     def retrieve(self, request, pk):
         queryset = CustomUser.objects.all()
         user = get_object_or_404(queryset, pk=pk)
@@ -47,8 +45,8 @@ class UserDetailView(viewsets.ViewSet):
         return Response(serializer.data)
 
 
-@permission_classes(AdminAndModirator)
 class CreateListUserView(APIView):
+    permission_classes = (AdminAndModirator, IsAuthenticated)
     def get(self, request):
         try:
             items = CustomUser.objects.all()
@@ -60,11 +58,11 @@ class CreateListUserView(APIView):
 
 class ChangePasswordView(generics.UpdateAPIView):
     queryset = CustomUser.objects.all()
-    permission_classes = (OnlyAdmin,)
+    permission_classes = (OnlyAdmin, IsAuthenticated)
     serializer_class = ChangePasswordSerializer
 
 class ChangeUserDetailsView(generics.UpdateAPIView):
-    permission_classes = (OnlyAdmin,)
+    permission_classes = (OnlyAdmin, IsAuthenticated)
     queryset = CustomUser.objects.all()
     serializer_class = ChangeUserDetailsSerializer
 

@@ -49,6 +49,9 @@ class AdminAndModirator(permissions.BasePermission):
 
         if request.user.user_group <=2:
             return True
+        
+        if obj == request.user:
+            return True
 
         return False
 

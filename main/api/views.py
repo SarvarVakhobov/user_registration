@@ -6,8 +6,10 @@ from rest_framework.views import APIView
 
 from .serializers import PostSerializer, TagSerializer, BlogSerializer, CategorySerializer, CommentsSerializer
 from main.models import Tag, Post, Category, Blog, Comments
+from accounts.api.permissions import OnlyAdmin, AdminAndModirator, AdminModiratorAndEditor
 
 class TagListView(APIView):
+    permission_classes = (AdminModiratorAndEditor, IsAuthenticated)
     def get(self, request):
         try:
             tags = Tag.objects.all()
@@ -18,15 +20,16 @@ class TagListView(APIView):
 
 class CreateTagView(generics.CreateAPIView):
     queryset = Tag.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (AdminModiratorAndEditor, IsAuthenticated)
     serializer_class = TagSerializer
 
 class CreatePostView(generics.CreateAPIView):
     queryset = Post.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (AdminModiratorAndEditor, IsAuthenticated)
     serializer_class = PostSerializer
 
 class PostView(APIView):
+    permission_classes = (AdminModiratorAndEditor, IsAuthenticated)
     def get(self, request, pk):
         try:
             post = Post.objects.get(id=pk)
@@ -36,6 +39,7 @@ class PostView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class PostListView(APIView):
+    permission_classes = (AdminModiratorAndEditor, IsAuthenticated)
     def get(self, request):
         try: 
             posts = Post.objects.all()
@@ -46,7 +50,7 @@ class PostListView(APIView):
 
 class EditPostView(generics.UpdateAPIView):
     queryset = Post.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (AdminModiratorAndEditor, IsAuthenticated)
     serializer_class = PostSerializer
 
     def update(self, request, *args, **kwargs):
@@ -57,4 +61,3 @@ class EditPostView(generics.UpdateAPIView):
         self.perform_update(serializer)
         return Response(serializer.data)
     
-# class Category
