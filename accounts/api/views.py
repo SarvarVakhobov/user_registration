@@ -11,6 +11,9 @@ from .serializers import RegisterSerializer, UserSerializer, ChangePasswordSeria
 from rest_framework import generics, viewsets, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from .permissions import OnlyAdmin, AdminAndModirator,AdminModiratorAndEditor
+
+@permission_classes(OnlyAdmin)
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -20,16 +23,22 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         return token
 
+
+@permission_classes(OnlyAdmin)
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
+
+@permission_classes(AdminAndModirator)
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
+
+@permission_classes(AdminModiratorAndEditor)
 class UserDetailView(viewsets.ViewSet):
     def retrieve(self, request, pk):
         queryset = CustomUser.objects.all()
@@ -37,6 +46,8 @@ class UserDetailView(viewsets.ViewSet):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
+
+@permission_classes(AdminAndModirator)
 class CreateListUserView(APIView):
     def get(self, request):
         try:
@@ -49,11 +60,11 @@ class CreateListUserView(APIView):
 
 class ChangePasswordView(generics.UpdateAPIView):
     queryset = CustomUser.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (OnlyAdmin,)
     serializer_class = ChangePasswordSerializer
 
 class ChangeUserDetailsView(generics.UpdateAPIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (OnlyAdmin,)
     queryset = CustomUser.objects.all()
     serializer_class = ChangeUserDetailsSerializer
 
